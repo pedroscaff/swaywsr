@@ -1,0 +1,28 @@
+[package]
+name = "swaywsr"
+version = "0.0.1"
+description = "Change i3-wm workspace names based on its contents"
+authors = ["Pedro Scaff <pedro@scaff.me>"]
+repository =  "https://github.com/pedroscaff/swaywsr"
+documentation =  "https://github.com/pedroscaff/swaywsr"
+readme = "README.md"
+keywords = ["sway-wm", "window-manager", "workspaces", "linux"]
+categories = ["command-line-utilities"]
+license = "MIT"
+exclude = ["/assets/*"]
+
+[badges]
+travis-ci = { repository = "pedroscaff/swaywsr" }
+
+[dependencies]
+exitfailure = "0.5.1"
+failure = "0.1.2"
+failure_derive = "0.1.2"
+lazy_static = "1.4.0"
+clap = "2.33.0"
+toml = "0.5.4"
+serde = { version = "1.0", features = ["derive"] }
+
+[dependencies.swayipc]
+version = "2.4.0"
+features = ["async"]
