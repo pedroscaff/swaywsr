@@ -10,6 +10,7 @@ keywords = ["sway-wm", "window-manager", "workspaces", "linux"]
 categories = ["command-line-utilities"]
 license = "MIT"
 exclude = ["/assets/*"]
+edition = "2018"
 
 [badges]
 travis-ci = { repository = "pedroscaff/swaywsr" }
@@ -22,7 +23,4 @@ lazy_static = "1.4.0"
 clap = "2.33.0"
 toml = "0.5.4"
 serde = { version = "1.0", features = ["derive"] }
-
-[dependencies.swayipc]
-version = "2.4.0"
-features = ["async"]
+swayipc = "2.4.0"

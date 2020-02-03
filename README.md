@@ -1,8 +1,8 @@
-i3wsr - i3 workspace renamer
+swaywsr - i3 workspace renamer
 ======
-[![Build Status](https://travis-ci.org/roosta/i3wsr.svg?branch=master)](https://travis-ci.org/roosta/i3wsr)
+[![Build Status](https://travis-ci.org/roosta/swaywsr.svg?branch=master)](https://travis-ci.org/roosta/swaywsr)
 
-`i3wsr` is a small program that uses [I3's](https://i3wm.org/) [IPC Interface](https://i3wm.org/docs/ipc.html)
+`swaywsr` is a small program that uses [I3's](https://i3wm.org/) [IPC Interface](https://i3wm.org/docs/ipc.html)
 to change the name of a workspace based on its contents.
 
 ## Details
@@ -10,14 +10,14 @@ to change the name of a workspace based on its contents.
 The chosen name for a workspace is a composite of the `WM_CLASS` X11 window
 property for each window in a workspace. In action it would look something like this:
 
-![](https://raw.githubusercontent.com/roosta/i3wsr/master/assets/preview.gif)
+![](https://raw.githubusercontent.com/roosta/swaywsr/master/assets/preview.gif)
 
 ## Installation
 [Rust](https://www.rust-lang.org/en-US/), and [Cargo](http://doc.crates.io/) is
-required, and `i3wsr` can be installed using cargo like so:
+required, and `swaywsr` can be installed using cargo like so:
 
 ```sh
-cargo install i3wsr
+cargo install swaywsr
 ```
 
 Or alternatively, you can build a release binary,
@@ -26,10 +26,10 @@ Or alternatively, you can build a release binary,
 cargo build --release
 ```
 
-Then place the built binary, located at `target/release/i3wsr`, somewhere on your `$path`.
+Then place the built binary, located at `target/release/swaywsr`, somewhere on your `$path`.
 
 ### Arch linux
-If you're running Arch you can install either [stable](https://aur.archlinux.org/packages/i3wsr/), or [latest](https://aur.archlinux.org/packages/i3wsr-git/) from AUR thanks to reddit user [u/OniTux](https://www.reddit.com/user/OniTux).
+If you're running Arch you can install either [stable](https://aur.archlinux.org/packages/swaywsr/), or [latest](https://aur.archlinux.org/packages/swaywsr-git/) from AUR thanks to reddit user [u/OniTux](https://www.reddit.com/user/OniTux).
 
 ## Usage
 Just launch the program and it'll listen for events if you are running I3.
@@ -37,9 +37,9 @@ Another option is to put something like this in your i3 config
 
 ```
 # cargo
-exec_always --no-startup-id $HOME/.cargo/bin/i3wsr
+exec_always --no-startup-id $HOME/.cargo/bin/swaywsr
 # AUR
-exec_always --no-startup-id /usr/bin/i3wsr
+exec_always --no-startup-id /usr/bin/swaywsr
 ```
 
 ### Options
@@ -73,12 +73,12 @@ seperator = ""
 For an overview of available options
 
 ```shell
-$ i3wsr -h
-i3wsr - i3 workspace renamer 1.2.0
+$ swaywsr -h
+swaywsr - i3 workspace renamer 1.2.0
 Daniel Berg <mail@roosta.sh>
 
 USAGE:
-    i3wsr [FLAGS] [OPTIONS]
+    swaywsr [FLAGS] [OPTIONS]
 
 FLAGS:
     -h, --help        Prints help information
@@ -135,7 +135,7 @@ env DISPLAY=:99.0 gpick
 env DISPLAY=:99.0 i3 -c /etc/i3/config
 ```
 
-refer to [.travis.yml](https://github.com/roosta/i3wsr/blob/master/.travis.yml) for a CI example
+refer to [.travis.yml](https://github.com/roosta/swaywsr/blob/master/.travis.yml) for a CI example
 
 ## Attribution
 This program would not be possible without

@@ -1,5 +1,6 @@
 extern crate swayipc;
-use swayipc::{Connection, EventType, Fallible};
+use swayipc::{Connection, EventType};
+use swayipc::reply::Event;
 
 extern crate swaywsr;
 
@@ -54,13 +55,28 @@ fn main() -> Result<(), ExitFailure> {
         }
     };
 
-    let mut listener = I3EventListener::connect()?;
-    let subs = [EventType::Window, EventType::Wokspace];
-    listener.subscribe(&subs)?;
+    let subs = [EventType::Window, EventType::Workspace];
+    let connection = Connection::new()?;
+    let mut command_connection = Connection::new()?;
 
-    for event in Connection::new()?.subscribe(&subs)? {
-        println!("{:?}\n", event?)
+    swaywsr::update_tree(&mut command_connection, &options)?;
+
+    for event in connection.subscribe(&subs)? {
+        match event? {
+            Event::Window(e) => {
+                if let Err(error) = swaywsr::handle_window_event(&e, &mut command_connection, &options) {
+                    eprintln!("handle_window_event error: {}", error);
+                }
+            }
+            Event::Workspace(e) => {
+                if let Err(error) = swaywsr::handle_workspace_event(&e, &mut command_connection, &options) {
+                    eprintln!("handle_workspace_event error: {}", error);
+                }
+            }
+            _ => {}
+        }
     }
+
     // swaywsr::update_tree(&x_conn, &mut i3_conn, &options)?;
 
     // for event in listener.listen() {
