@@ -4,7 +4,7 @@ swaywsr - sway workspace renamer
 `swaywsr` is a small program that uses [Sways's](https://swaywm.org/) [IPC Interface](https://github.com/swaywm/sway/blob/master/sway/sway-ipc.7.scd)
 to change the name of a workspace based on its contents.
 
-It is a port from https://github.com/roosta/i3wsr which I (@pedroscaff) also contributed to. Most of the code is the same.
+It is a port from [Daniel Berg's (roosta)](https://github.com/roosta) [i3wsr](https://github.com/roosta/i3wsr) which I also contributed to. Most of the code is the same.
 
 ## Details
 
@@ -105,11 +105,9 @@ You can take this a bit further by using a bar that trims the workspace number a
 
 ## Contributors
 * [Pedro Scaff (pedroscaff)](https://github.com/pedroscaff)
-* [Daniel Berg (roosta)](https://github.com/roosta)
-* [Cauê Baasch de Souza (cauebs)](https://github.com/cauebs)
 
 ## Attribution
-Thanks @roosta for the original [i3wsr](https://github.com/roosta/i3wsr)
+Thanks [Daniel Berg (roosta)](https://github.com/roosta) for the original [i3wsr](https://github.com/roosta/i3wsr) implementation
 This program would not be possible without
 [swayipc-rs](https://github.com/JayceFayne/swayipc-rs),
 a rust library for controlling sway-wm through its IPC interface and
