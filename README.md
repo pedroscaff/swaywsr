@@ -110,4 +110,4 @@ You can take this a bit further by using a bar that trims the workspace number a
 Thanks [Daniel Berg (roosta)](https://github.com/roosta) for the original [i3wsr](https://github.com/roosta/i3wsr) implementation
 This program would not be possible without
 [swayipc-rs](https://github.com/JayceFayne/swayipc-rs),
-a rust library for controlling sway-wm through its IPC interface and
+a rust library for controlling sway-wm through its IPC interface.
