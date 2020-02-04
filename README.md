@@ -11,7 +11,7 @@ It is a port from [Daniel Berg's (roosta)](https://github.com/roosta) [i3wsr](ht
 The chosen name for a workspace is a composite of the `app_id` (wayland native) or `WM_CLASS` X11 window
 property for each window in a workspace. In action it would look something like this:
 
-![](https://raw.githubusercontent.com/roosta/swaywsr/master/assets/preview.gif)
+![](https://raw.githubusercontent.com/pedroscaff/swaywsr/master/assets/preview.png)
 
 ## Installation
 Build a release binary,
@@ -60,8 +60,8 @@ For an overview of available options
 
 ```shell
 $ swaywsr -h
-swaywsr - i3 workspace renamer 1.2.0
-Daniel Berg <mail@roosta.sh>
+swaywsr - sway workspace renamer 1.0.0
+Pedro Scaff <pedro@scaff.me>
 
 USAGE:
     swaywsr [FLAGS] [OPTIONS]
@@ -86,7 +86,7 @@ workspace name. So your sway configuration need to reflect this:
 bindsym $mod+1 workspace number 1
 ```
 
-If you're like me and don't necessarily bind your workspaces to only numbers, or
+If you don't necessarily bind your workspaces to only numbers, or
 you want to keep a part of the name constant you can do like this:
 
 ```
@@ -107,7 +107,6 @@ You can take this a bit further by using a bar that trims the workspace number a
 * [Pedro Scaff (pedroscaff)](https://github.com/pedroscaff)
 
 ## Attribution
-Thanks [Daniel Berg (roosta)](https://github.com/roosta) for the original [i3wsr](https://github.com/roosta/i3wsr) implementation
-This program would not be possible without
+Thanks [Daniel Berg (roosta)](https://github.com/roosta) for the original [i3wsr](https://github.com/roosta/i3wsr) implementation. This program would not be possible without
 [swayipc-rs](https://github.com/JayceFayne/swayipc-rs),
 a rust library for controlling sway-wm through its IPC interface.

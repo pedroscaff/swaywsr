@@ -10,8 +10,8 @@ extern crate lazy_static;
 
 extern crate toml;
 
+use swayipc::reply::{Node, NodeType, WindowChange, WindowEvent, WorkspaceChange, WorkspaceEvent};
 use swayipc::Connection;
-use swayipc::reply::{WindowEvent, WorkspaceEvent, WorkspaceChange, Node, NodeType, WindowChange};
 
 use std::collections::HashMap as Map;
 
@@ -22,12 +22,15 @@ pub struct Options {
     pub icons: Map<String, char>,
     pub aliases: Map<String, String>,
     pub general: Map<String, String>,
-    pub names: bool
+    pub names: bool,
 }
 
 #[derive(Debug, Fail)]
 enum LookupError {
-    #[fail(display = "Failed to get app_id or window_properties for node: {:#?}", _0)]
+    #[fail(
+        display = "Failed to get app_id or window_properties for node: {:#?}",
+        _0
+    )]
     MissingInformation(String),
     #[fail(display = "Failed to get name for workspace: {:#?}", _0)]
     WorkspaceName(Box<Node>),
@@ -37,12 +40,10 @@ fn get_class(node: &Node, options: &Options) -> Result<String, LookupError> {
     let name = {
         match &node.app_id {
             Some(id) => Some(id.to_owned()),
-            None => {
-                match &node.window_properties {
-                    Some(properties) => Some(properties.class.to_owned()),
-                    None => None                    
-                }
-            }
+            None => match &node.window_properties {
+                Some(properties) => Some(properties.class.to_owned()),
+                None => None,
+            },
         }
     };
     if let Some(class) = name {
@@ -123,10 +124,9 @@ fn get_classes(workspace: &Node, options: &Options) -> Result<Vec<String>, Error
 pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(), Error> {
     let tree = connection.get_tree()?;
     for workspace in get_workspaces(tree) {
-
         let separator = match options.general.get("separator") {
             Some(s) => s,
-            None => " | "
+            None => " | ",
         };
 
         let classes = get_classes(&workspace, options)?.join(separator);
@@ -155,20 +155,26 @@ pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(),
     Ok(())
 }
 
-pub fn handle_window_event(event: &WindowEvent, connection: &mut Connection, options: &Options) -> Result<(), Error> {
+pub fn handle_window_event(
+    event: &WindowEvent,
+    connection: &mut Connection,
+    options: &Options,
+) -> Result<(), Error> {
     match event.change {
         WindowChange::New | WindowChange::Close | WindowChange::Move => {
             update_tree(connection, options)
         }
-        _ => Ok(())
+        _ => Ok(()),
     }
 }
 
-pub fn handle_workspace_event(event: &WorkspaceEvent, connection: &mut Connection, options: &Options) -> Result<(), Error> {
+pub fn handle_workspace_event(
+    event: &WorkspaceEvent,
+    connection: &mut Connection,
+    options: &Options,
+) -> Result<(), Error> {
     match event.change {
-        WorkspaceChange::Empty | WorkspaceChange::Focus => {
-            update_tree(connection, options)
-        }
-        _ => Ok(())
+        WorkspaceChange::Empty | WorkspaceChange::Focus => update_tree(connection, options),
+        _ => Ok(()),
     }
 }
