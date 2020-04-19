@@ -25,7 +25,7 @@ Just launch the program and it'll listen for events if you are running sway.
 Another option is to put something like this in your sway config
 
 ```
-exec_always --no-startup-id $PATH_TO_RELEASE_BINARY
+exec_always $PATH_TO_RELEASE_BINARY
 ```
 
 ### Options
