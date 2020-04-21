@@ -28,6 +28,11 @@ fn main() -> Result<(), ExitFailure> {
                 .help("Set to no to display only icons (if available)"),
         )
         .arg(
+            Arg::with_name("no-dupes")
+                .long("no-dupes")
+                .help("Set to display each instance of a class only once"),
+        )
+        .arg(
             Arg::with_name("config")
                 .long("config")
                 .short("c")
@@ -38,6 +43,7 @@ fn main() -> Result<(), ExitFailure> {
 
     let icons = matches.value_of("icons").unwrap_or("");
     let no_names = matches.is_present("no-names");
+    let no_dupes = matches.is_present("no-dupes");
     let options = match matches.value_of("config") {
         Some(filename) => {
             let file_config = match swaywsr::config::read_toml_config(filename) {
@@ -53,6 +59,7 @@ fn main() -> Result<(), ExitFailure> {
                 aliases: file_config.aliases,
                 general: file_config.general,
                 names: !no_names,
+                no_dupes: no_dupes,
             }
         }
         None => swaywsr::Options {
@@ -60,6 +67,7 @@ fn main() -> Result<(), ExitFailure> {
             aliases: swaywsr::config::EMPTY_MAP.clone(),
             general: swaywsr::config::EMPTY_MAP.clone(),
             names: !no_names,
+            no_dupes: no_dupes,
         },
     };
 

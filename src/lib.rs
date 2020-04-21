@@ -14,6 +14,7 @@ use swayipc::reply::{Node, NodeType, WindowChange, WindowEvent, WorkspaceChange,
 use swayipc::Connection;
 
 use std::collections::HashMap as Map;
+use std::collections::HashSet;
 
 pub mod config;
 pub mod icons;
@@ -23,6 +24,7 @@ pub struct Options {
     pub aliases: Map<String, String>,
     pub general: Map<String, String>,
     pub names: bool,
+    pub no_dupes: bool,
 }
 
 #[derive(Debug, Fail)]
@@ -47,27 +49,38 @@ fn get_class(node: &Node, options: &Options) -> Result<String, LookupError> {
         }
     };
     if let Some(class) = name {
-        let results_with_icons = {
-            let class_display_name = match options.aliases.get(&class) {
-                Some(alias) => alias,
-                None => &class,
-            };
-            match options.icons.get(&class) {
-                Some(icon) => {
-                    if options.names {
-                        format!("{} {}", icon, class_display_name)
-                    } else {
-                        format!("{}", icon)
-                    }
-                }
-                None => format!("{}", class_display_name),
-            }
+        let class_display_name = match options.aliases.get(&class) {
+            Some(alias) => alias,
+            None => &class,
         };
-
-        Ok(results_with_icons.to_string())
+        Ok(format!("{}", class_display_name))
     } else {
         Err(LookupError::MissingInformation(format!("{:?}", node)))
     }
+}
+
+fn get_icons(classes: &Vec<String>, options: &Options) -> Result<Vec<String>, LookupError> {
+    let mut iconised_classes = Vec::new();
+    for class in classes {
+        iconised_classes.push(get_icon(class.to_string(), options)?);
+    }
+    Ok(iconised_classes)
+}
+
+fn get_icon(class_name: String, options: &Options) -> Result<String, LookupError> {
+    let iconised_name = {
+        match options.icons.get(&class_name) {
+            Some(icon) => {
+                if options.names {
+                    format!("{} {}", icon, class_name)
+                } else {
+                    format!("{}", icon)
+                }
+            }
+            None => format!("{}", class_name),
+        }
+    };
+    Ok(iconised_name.to_string())
 }
 
 /// return a collection of workspace nodes
@@ -117,7 +130,13 @@ fn get_classes(workspace: &Node, options: &Options) -> Result<Vec<String>, Error
         window_classes.push(get_class(node, options)?);
     }
 
-    Ok(window_classes)
+    if options.no_dupes {
+        let mut unique = HashSet::new();
+        window_classes.retain(|class| unique.insert(class.clone()));
+        Ok(unique.into_iter().collect())
+    } else {
+        Ok(window_classes)
+    }
 }
 
 /// Update all workspace names in tree
@@ -129,11 +148,12 @@ pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(),
             None => " | ",
         };
 
-        let classes = get_classes(&workspace, options)?.join(separator);
-        let classes = if !classes.is_empty() {
-            format!(" {}", classes)
+        let classes = get_classes(&workspace, options)?;
+        let iconised_classes = get_icons(&classes, options)?.join(separator);
+        let iconised_classes = if !iconised_classes.is_empty() {
+            format!(" {}", iconised_classes)
         } else {
-            classes
+            iconised_classes
         };
 
         let old: String = workspace
@@ -144,7 +164,7 @@ pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(),
         let mut new = old.split(' ').next().unwrap().to_owned();
 
         if !classes.is_empty() {
-            new.push_str(&classes);
+            new.push_str(&iconised_classes);
         }
 
         if old != new {
