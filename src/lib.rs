@@ -145,7 +145,6 @@ fn get_classes(workspace: &Node, options: &Options) -> Result<Vec<String>, Error
     if options.no_dupes {
         let mut unique = HashSet::new();
         window_classes.retain(|class| unique.insert(class.clone()));
-        window_classes.sort();
     }
     Ok(window_classes)
 }
