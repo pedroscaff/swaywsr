@@ -38,7 +38,7 @@ enum LookupError {
     WorkspaceName(Box<Node>),
 }
 
-fn get_class(node: &Node, options: &Options) -> Result<String, LookupError> {
+fn get_class(node: &Node) -> Result<String, LookupError> {
     let name = {
         match &node.app_id {
             Some(id) => Some(id.to_owned()),
@@ -49,11 +49,7 @@ fn get_class(node: &Node, options: &Options) -> Result<String, LookupError> {
         }
     };
     if let Some(class) = name {
-        let class_display_name = match options.aliases.get(&class) {
-            Some(alias) => alias,
-            None => &class,
-        };
-        Ok(format!("{}", class_display_name))
+        Ok(format!("{}", &class))
     } else {
         Err(LookupError::MissingInformation(format!("{:?}", node)))
     }
@@ -81,6 +77,22 @@ fn get_icon(class_name: String, options: &Options) -> Result<String, LookupError
         }
     };
     Ok(iconised_name.to_string())
+}
+
+fn get_aliases(classes: &Vec<String>, options: &Options) -> Result<Vec<String>, LookupError> {
+    let mut aliased_classes = Vec::new();
+    for class in classes {
+        aliased_classes.push(get_alias(class.to_string(), options)?);
+    }
+    Ok(aliased_classes)
+}
+
+fn get_alias(class_name: String, options: &Options) -> Result<String, LookupError> {
+    let class_display_name = match options.aliases.get(&class_name) {
+            Some(alias) => alias,
+            None => &class_name,
+        };
+        Ok(format!("{}", class_display_name))
 }
 
 /// return a collection of workspace nodes
@@ -127,7 +139,7 @@ fn get_classes(workspace: &Node, options: &Options) -> Result<Vec<String>, Error
 
     let mut window_classes = Vec::new();
     for node in window_nodes {
-        window_classes.push(get_class(node, options)?);
+        window_classes.push(get_class(node)?);
     }
 
     if options.no_dupes {
@@ -149,11 +161,12 @@ pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(),
         };
 
         let classes = get_classes(&workspace, options)?;
-        let iconised_classes = get_icons(&classes, options)?.join(separator);
-        let iconised_classes = if !iconised_classes.is_empty() {
-            format!(" {}", iconised_classes)
+        let iconised_classes = get_icons(&classes, options)?;
+        let aliased_classes = get_aliases(&iconised_classes, options)?.join(separator);
+        let renamed_classes = if !aliased_classes.is_empty() {
+            format!(" {}", aliased_classes)
         } else {
-            iconised_classes
+            aliased_classes
         };
 
         let old: String = workspace
@@ -164,7 +177,7 @@ pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(),
         let mut new = old.split(' ').next().unwrap().to_owned();
 
         if !classes.is_empty() {
-            new.push_str(&iconised_classes);
+            new.push_str(&renamed_classes);
         }
 
         if old != new {
