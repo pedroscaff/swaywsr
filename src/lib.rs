@@ -104,7 +104,7 @@ fn get_window_nodes(mut nodes: Vec<Vec<&Node>>) -> Vec<&Node> {
 }
 
 /// Return a collection of window classes
-fn get_classes(workspace: &Node, options: &Options) -> Result<Vec<String>, Error> {
+fn get_classes(workspace: &Node, options: &Options) -> Vec<String> {
     let window_nodes = {
         let mut f = get_window_nodes(vec![workspace.floating_nodes.iter().collect()]);
         let mut n = get_window_nodes(vec![workspace.nodes.iter().collect()]);
@@ -114,10 +114,17 @@ fn get_classes(workspace: &Node, options: &Options) -> Result<Vec<String>, Error
 
     let mut window_classes = Vec::new();
     for node in window_nodes {
-        window_classes.push(get_class(node, options)?);
+        let class = match get_class(node, options) {
+            Ok(class) => class,
+            Err(e) => {
+                eprintln!("get class error: {}", e);
+                continue;
+            }
+        };
+        window_classes.push(class);
     }
 
-    Ok(window_classes)
+    window_classes
 }
 
 /// Update all workspace names in tree
@@ -129,7 +136,7 @@ pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(),
             None => " | ",
         };
 
-        let classes = get_classes(&workspace, options)?.join(separator);
+        let classes = get_classes(&workspace, options).join(separator);
         let classes = if !classes.is_empty() {
             format!(" {}", classes)
         } else {
