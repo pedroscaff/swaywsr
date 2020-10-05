@@ -1,6 +1,6 @@
 [package]
 name = "swaywsr"
-version = "1.0.0"
+version = "1.0.1"
 description = "Change i3-wm workspace names based on its contents"
 authors = ["Pedro Scaff <pedro@scaff.me>"]
 repository =  "https://github.com/pedroscaff/swaywsr"
