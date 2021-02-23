@@ -74,7 +74,9 @@ fn main() -> Result<(), ExitFailure> {
         config.options.insert("no_names".to_string(), no_names);
     }
     if remove_duplicates {
-        config.options.insert("remove_duplicates".to_string(), remove_duplicates);
+        config
+            .options
+            .insert("remove_duplicates".to_string(), remove_duplicates);
     }
 
     let subs = [EventType::Window, EventType::Workspace];

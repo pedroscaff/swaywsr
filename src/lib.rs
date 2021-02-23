@@ -62,10 +62,7 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
         match &node.app_id {
             Some(id) => Some(id.to_owned()),
             None => match &node.window_properties {
-                Some(properties) => Some(properties.class
-                    .as_ref()
-                    .unwrap()
-                    .to_owned()),
+                Some(properties) => Some(properties.class.as_ref().unwrap().to_owned()),
                 None => None,
             },
         }
@@ -97,7 +94,7 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
                 None => {
                     format!("{}", class_display_name)
                 }
-            }
+            },
         })
     } else {
         Err(LookupError::MissingInformation(format!("{:?}", node)))
