@@ -1,3 +1,6 @@
+extern crate itertools;
+use itertools::Itertools;
+
 #[macro_use]
 extern crate failure_derive;
 extern crate failure;
@@ -18,11 +21,22 @@ use std::collections::HashMap as Map;
 pub mod config;
 pub mod icons;
 
-pub struct Options {
+pub struct Config {
     pub icons: Map<String, char>,
     pub aliases: Map<String, String>,
     pub general: Map<String, String>,
-    pub names: bool,
+    pub options: Map<String, bool>,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Config {
+            icons: icons::NONE.clone(),
+            aliases: config::EMPTY_MAP.clone(),
+            general: config::EMPTY_MAP.clone(),
+            options: config::EMPTY_OPT_MAP.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Fail)]
@@ -36,7 +50,14 @@ enum LookupError {
     WorkspaceName(Box<Node>),
 }
 
-fn get_class(node: &Node, options: &Options) -> Result<String, LookupError> {
+fn get_option(config: &Config, key: &str) -> bool {
+    return match config.options.get(key) {
+        Some(v) => *v,
+        None => false,
+    };
+}
+
+fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
     let name = {
         match &node.app_id {
             Some(id) => Some(id.to_owned()),
@@ -47,24 +68,34 @@ fn get_class(node: &Node, options: &Options) -> Result<String, LookupError> {
         }
     };
     if let Some(class) = name {
-        let results_with_icons = {
-            let class_display_name = match options.aliases.get(&class) {
-                Some(alias) => alias,
-                None => &class,
-            };
-            match options.icons.get(&class) {
-                Some(icon) => {
-                    if options.names {
-                        format!("{} {}", icon, class_display_name)
-                    } else {
-                        format!("{}", icon)
-                    }
-                }
-                None => format!("{}", class_display_name),
-            }
+        let class_display_name = match config.aliases.get(&class) {
+            Some(alias) => alias,
+            None => &class,
         };
 
-        Ok(results_with_icons.to_string())
+        let no_names = get_option(&config, "no_names");
+
+        Ok(match config.icons.get(&class) {
+            Some(icon) => {
+                if no_names {
+                    format!("{}", icon)
+                } else {
+                    format!("{} {}", icon, class_display_name)
+                }
+            }
+            None => match config.general.get("default_icon") {
+                Some(default_icon) => {
+                    if no_names {
+                        format!("{}", default_icon)
+                    } else {
+                        format!("{} {}", default_icon, class_display_name)
+                    }
+                }
+                None => {
+                    format!("{}", class_display_name)
+                }
+            }
+        })
     } else {
         Err(LookupError::MissingInformation(format!("{:?}", node)))
     }
@@ -104,7 +135,7 @@ fn get_window_nodes(mut nodes: Vec<Vec<&Node>>) -> Vec<&Node> {
 }
 
 /// Return a collection of window classes
-fn get_classes(workspace: &Node, options: &Options) -> Vec<String> {
+fn get_classes(workspace: &Node, config: &Config) -> Vec<String> {
     let window_nodes = {
         let mut f = get_window_nodes(vec![workspace.floating_nodes.iter().collect()]);
         let mut n = get_window_nodes(vec![workspace.nodes.iter().collect()]);
@@ -114,7 +145,7 @@ fn get_classes(workspace: &Node, options: &Options) -> Vec<String> {
 
     let mut window_classes = Vec::new();
     for node in window_nodes {
-        let class = match get_class(node, options) {
+        let class = match get_class(node, config) {
             Ok(class) => class,
             Err(e) => {
                 eprintln!("get class error: {}", e);
@@ -128,15 +159,22 @@ fn get_classes(workspace: &Node, options: &Options) -> Vec<String> {
 }
 
 /// Update all workspace names in tree
-pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(), Error> {
+pub fn update_tree(connection: &mut Connection, config: &Config) -> Result<(), Error> {
     let tree = connection.get_tree()?;
     for workspace in get_workspaces(tree) {
-        let separator = match options.general.get("separator") {
+        let separator = match config.general.get("separator") {
             Some(s) => s,
             None => " | ",
         };
 
-        let classes = get_classes(&workspace, options).join(separator);
+        let classes = get_classes(&workspace, config);
+        let classes = if get_option(&config, "remove_duplicates") {
+            classes.into_iter().unique().collect()
+        } else {
+            classes
+        };
+
+        let classes = classes.join(separator);
         let classes = if !classes.is_empty() {
             format!(" {}", classes)
         } else {
@@ -165,11 +203,11 @@ pub fn update_tree(connection: &mut Connection, options: &Options) -> Result<(),
 pub fn handle_window_event(
     event: &WindowEvent,
     connection: &mut Connection,
-    options: &Options,
+    config: &Config,
 ) -> Result<(), Error> {
     match event.change {
         WindowChange::New | WindowChange::Close | WindowChange::Move => {
-            update_tree(connection, options)
+            update_tree(connection, config)
         }
         _ => Ok(()),
     }
@@ -178,10 +216,10 @@ pub fn handle_window_event(
 pub fn handle_workspace_event(
     event: &WorkspaceEvent,
     connection: &mut Connection,
-    options: &Options,
+    config: &Config,
 ) -> Result<(), Error> {
     match event.change {
-        WorkspaceChange::Empty | WorkspaceChange::Focus => update_tree(connection, options),
+        WorkspaceChange::Empty | WorkspaceChange::Focus => update_tree(connection, config),
         _ => Ok(()),
     }
 }
