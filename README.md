@@ -34,7 +34,11 @@ You can configure icons for the respective classes, a very basic preset for font
 
 If you have icons and don't want the names to be displayed, you can use the `--no-names` flag.
 
-For further customization, use the `--config path_to_file.toml` option. The `toml` file has to fields, `icons` to assign icons to classes, and `aliases` to assign alternative names to be displayed.
+For further customization, use the `--config path_to_file.toml` option. The `toml` file has four fields:
+- `icons` to assign icons to classes
+- `aliases` to assign alternative names to be displayed 
+- `general` to assign the separator and default icon
+- `options` to assign additional flags like `--no-names`
 
 Example config can be found in `assets/example_config.toml`
 
@@ -60,21 +64,21 @@ For an overview of available options
 
 ```shell
 $ swaywsr -h
-swaywsr - sway workspace renamer 1.0.0
+swaywsr - sway workspace renamer 1.1.0
 Pedro Scaff <pedro@scaff.me>
 
 USAGE:
     swaywsr [FLAGS] [OPTIONS]
 
 FLAGS:
-    -h, --help        Prints help information
-        --no-names    Set to no to display only icons (if available)
-    -V, --version     Prints version information
+    -h, --help                 Prints help information
+    -n, --no-names             Set to no to display only icons (if available)
+    -r, --remove-duplicates    Remove duplicate entries in workspace
+    -V, --version              Prints version information
 
 OPTIONS:
     -c, --config <config>    Path to toml config file
-        --icons <icons>      Sets icons to be used [possible values: awesome]
-
+    -i, --icons <icons>      Sets icons to be used [possible values: awesome]
 ```
 
 ## Configuration
