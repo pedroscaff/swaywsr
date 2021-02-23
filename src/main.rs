@@ -18,6 +18,7 @@ fn main() -> Result<(), ExitFailure> {
         .arg(
             Arg::with_name("icons")
                 .long("icons")
+                .short("i")
                 .help("Sets icons to be used")
                 .possible_values(&["awesome"])
                 .takes_value(true),
@@ -25,6 +26,7 @@ fn main() -> Result<(), ExitFailure> {
         .arg(
             Arg::with_name("no-names")
                 .long("no-names")
+                .short("n")
                 .help("Set to no to display only icons (if available)"),
         )
         .arg(
