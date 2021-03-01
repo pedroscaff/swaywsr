@@ -1,6 +1,6 @@
 [package]
 name = "swaywsr"
-version = "1.0.1"
+version = "1.1.0"
 description = "Change i3-wm workspace names based on its contents"
 authors = ["Pedro Scaff <pedro@scaff.me>"]
 repository =  "https://github.com/pedroscaff/swaywsr"
@@ -17,10 +17,11 @@ travis-ci = { repository = "pedroscaff/swaywsr" }
 
 [dependencies]
 exitfailure = "0.5.1"
-failure = "0.1.2"
-failure_derive = "0.1.2"
+failure = "0.1.8"
+failure_derive = "0.1.8"
 lazy_static = "1.4.0"
-clap = "2.33.0"
-toml = "0.5.4"
-serde = { version = "1.0", features = ["derive"] }
-swayipc = "2.4.0"
+clap = "2.33.3"
+toml = "0.5.8"
+serde = { version = "1.0.123", features = ["derive"] }
+swayipc = "2.7.2"
+itertools = "0.10.0"
