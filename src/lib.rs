@@ -65,7 +65,7 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
                 .window_properties
                 .as_ref()
                 .and_then(|p| p.class.as_ref())
-                .map(|r| r.to_owned()),
+                .map(|p| p.to_owned()),
         }
     };
 
