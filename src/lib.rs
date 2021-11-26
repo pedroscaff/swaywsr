@@ -61,12 +61,14 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
     let name = {
         match &node.app_id {
             Some(id) => Some(id.to_owned()),
-            None => match &node.window_properties {
-                Some(properties) => Some(properties.class.as_ref().unwrap().to_owned()),
-                None => None,
-            },
+            None => node
+                .window_properties
+                .as_ref()
+                .and_then(|p| p.class.as_ref())
+                .map(|r| r.to_owned()),
         }
     };
+
     if let Some(class) = name {
         let class_display_name = match config.aliases.get(&class) {
             Some(alias) => alias,
