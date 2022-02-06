@@ -57,7 +57,7 @@ fn main() -> Result<(), ExitFailure> {
                 icons: file_config
                     .icons
                     .into_iter()
-                    .chain(swaywsr::icons::get_icons(&icons))
+                    .chain(swaywsr::icons::get_icons(icons))
                     .collect(),
                 aliases: file_config.aliases,
                 general: file_config.general,
@@ -65,7 +65,7 @@ fn main() -> Result<(), ExitFailure> {
             }
         }
         None => swaywsr::Config {
-            icons: swaywsr::icons::get_icons(&icons),
+            icons: swaywsr::icons::get_icons(icons),
             aliases: swaywsr::config::EMPTY_MAP.clone(),
             general: swaywsr::config::EMPTY_MAP.clone(),
             options: swaywsr::config::EMPTY_OPT_MAP.clone(),

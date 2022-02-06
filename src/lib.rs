@@ -75,7 +75,7 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
             None => &class,
         };
 
-        let no_names = get_option(&config, "no_names");
+        let no_names = get_option(config, "no_names");
 
         Ok(match config.icons.get(&class) {
             Some(icon) => {
@@ -88,13 +88,13 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
             None => match config.general.get("default_icon") {
                 Some(default_icon) => {
                     if no_names {
-                        format!("{}", default_icon)
+                        default_icon.to_string()
                     } else {
                         format!("{} {}", default_icon, class_display_name)
                     }
                 }
                 None => {
-                    format!("{}", class_display_name)
+                    class_display_name.to_string()
                 }
             },
         })
@@ -125,9 +125,9 @@ fn get_window_nodes(mut nodes: Vec<Vec<&Node>>) -> Vec<&Node> {
     while let Some(next) = nodes.pop() {
         for n in next {
             nodes.push(n.nodes.iter().collect());
-            if let Some(_) = n.window {
+            if n.window.is_some() {
                 window_nodes.push(n);
-            } else if let Some(_) = n.app_id {
+            } else if n.app_id.is_some() {
                 window_nodes.push(n);
             }
         }
@@ -170,7 +170,7 @@ pub fn update_tree(connection: &mut Connection, config: &Config) -> Result<(), E
         };
 
         let classes = get_classes(&workspace, config);
-        let classes = if get_option(&config, "remove_duplicates") {
+        let classes = if get_option(config, "remove_duplicates") {
             classes.into_iter().unique().collect()
         } else {
             classes
