@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 extern crate swayipc;
 use swayipc::reply::Event;
 use swayipc::{Connection, EventType};
@@ -47,29 +49,26 @@ fn main() -> Result<(), ExitFailure> {
     let icons = matches.value_of("icons").unwrap_or("");
     let no_names = matches.is_present("no-names");
     let remove_duplicates = matches.is_present("remove-duplicates");
-    let mut config = match matches.value_of("config") {
-        Some(filename) => {
-            let file_config = match swaywsr::config::read_toml_config(filename) {
-                Ok(config) => config,
-                Err(e) => panic!("Could not parse config file\n {}", e),
-            };
-            swaywsr::Config {
-                icons: file_config
-                    .icons
-                    .into_iter()
-                    .chain(swaywsr::icons::get_icons(icons))
-                    .collect(),
-                aliases: file_config.aliases,
-                general: file_config.general,
-                options: file_config.options,
-            }
-        }
-        None => swaywsr::Config {
-            icons: swaywsr::icons::get_icons(icons),
-            aliases: swaywsr::config::EMPTY_MAP.clone(),
-            general: swaywsr::config::EMPTY_MAP.clone(),
-            options: swaywsr::config::EMPTY_OPT_MAP.clone(),
-        },
+
+    let config_path = match matches.value_of("config") {
+        Some(config_path) => PathBuf::from(config_path),
+        None => swaywsr::config::xdg_config_home().join("swaywsr/config.toml"),
+    };
+
+    let file_config = match swaywsr::config::read_toml_config(&config_path) {
+        Ok(config) => config,
+        Err(e) => panic!("Could not parse config file\n {}", e),
+    };
+
+    let mut config = swaywsr::Config {
+        icons: file_config
+            .icons
+            .into_iter()
+            .chain(swaywsr::icons::get_icons(icons))
+            .collect(),
+        aliases: file_config.aliases,
+        general: file_config.general,
+        options: file_config.options,
     };
 
     if no_names {
