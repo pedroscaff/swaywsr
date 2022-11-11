@@ -30,15 +30,16 @@ exec_always $PATH_TO_RELEASE_BINARY
 
 ### Options
 
-You can configure icons for the respective classes, a very basic preset for font-awesome is configured, to enable it use the option `--icons awesome` (requires font-awesome to be installed).
 
-If you have icons and don't want the names to be displayed, you can use the `--no-names` flag.
-
-For further customization, use the `--config path_to_file.toml` option. The `toml` file has four fields:
+You must provide a config file that is passed using the `--config path_to_file.toml` option. The `toml` file has four fields:
 - `icons` to assign icons to classes
 - `aliases` to assign alternative names to be displayed 
 - `general` to assign the separator and default icon
 - `options` to assign additional flags like `--no-names`
+
+You can configure icons for the respective classes, a very basic preset for font-awesome is configured, to enable it use the option `--icons awesome` (requires font-awesome to be installed).
+
+If you have icons and don't want the names to be displayed, you can use the `--no-names` flag.
 
 Example config can be found in `assets/example_config.toml`
 
