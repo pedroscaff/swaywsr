@@ -61,10 +61,9 @@ fn main() -> Result<(), ExitFailure> {
     };
 
     let mut config = swaywsr::Config {
-        icons: file_config
-            .icons
+        icons: swaywsr::icons::get_icons(icons)
             .into_iter()
-            .chain(swaywsr::icons::get_icons(icons))
+            .chain(file_config.icons)
             .collect(),
         aliases: file_config.aliases,
         general: file_config.general,
