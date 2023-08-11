@@ -1,67 +1,38 @@
+use anyhow::Context;
+use clap::Parser;
 use std::path::PathBuf;
+use swayipc::{Connection, Event, EventType};
 
-extern crate swayipc;
-use swayipc::reply::Event;
-use swayipc::{Connection, EventType};
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    /// Set to no to display only icons (if available)
+    #[arg(short, long)]
+    #[clap(value_parser(["awesome"]))]
+    icons: Option<String>,
+    /// Set to no to display only icons (if available)
+    #[arg(short, long, default_value_t = false)]
+    no_names: bool,
+    /// Path to toml config file
+    #[arg(short, long)]
+    config: Option<PathBuf>,
+    /// Remove duplicate entries in workspace
+    #[arg(short, long, default_value_t = false)]
+    remove_duplicates: bool,
+}
 
-extern crate swaywsr;
+fn main() -> anyhow::Result<()> {
+    let cli = Cli::parse();
 
-extern crate exitfailure;
-use exitfailure::ExitFailure;
+    let config_path = cli
+        .config
+        .unwrap_or(swaywsr::config::xdg_config_home().join("swaywsr/config.toml"));
+    let file_config = swaywsr::config::read_toml_config(&config_path)
+        .with_context(|| format!("Could not parse config file at {}", config_path.display()))?;
 
-#[macro_use]
-extern crate clap;
-use clap::{App, Arg};
-
-fn main() -> Result<(), ExitFailure> {
-    let matches = App::new("swaywsr - sway workspace renamer")
-        .version(crate_version!())
-        .author(crate_authors!(",\n"))
-        .arg(
-            Arg::with_name("icons")
-                .long("icons")
-                .short("i")
-                .help("Sets icons to be used")
-                .possible_values(&["awesome"])
-                .takes_value(true),
-        )
-        .arg(
-            Arg::with_name("no-names")
-                .long("no-names")
-                .short("n")
-                .help("Set to no to display only icons (if available)"),
-        )
-        .arg(
-            Arg::with_name("config")
-                .long("config")
-                .short("c")
-                .help("Path to toml config file")
-                .takes_value(true),
-        )
-        .arg(
-            Arg::with_name("remove-duplicates")
-                .long("remove-duplicates")
-                .short("r")
-                .help("Remove duplicate entries in workspace"),
-        )
-        .get_matches();
-
-    let icons = matches.value_of("icons").unwrap_or("");
-    let no_names = matches.is_present("no-names");
-    let remove_duplicates = matches.is_present("remove-duplicates");
-
-    let config_path = match matches.value_of("config") {
-        Some(config_path) => PathBuf::from(config_path),
-        None => swaywsr::config::xdg_config_home().join("swaywsr/config.toml"),
-    };
-
-    let file_config = match swaywsr::config::read_toml_config(&config_path) {
-        Ok(config) => config,
-        Err(e) => panic!("Could not parse config file\n {}", e),
-    };
-
+    let icons = cli.icons.unwrap_or("".to_string());
     let mut config = swaywsr::Config {
-        icons: swaywsr::icons::get_icons(icons)
+        icons: swaywsr::icons::get_icons(&icons)
             .into_iter()
             .chain(file_config.icons)
             .collect(),
@@ -70,13 +41,13 @@ fn main() -> Result<(), ExitFailure> {
         options: file_config.options,
     };
 
-    if no_names {
-        config.options.insert("no_names".to_string(), no_names);
+    if cli.no_names {
+        config.options.insert("no_names".to_string(), cli.no_names);
     }
-    if remove_duplicates {
+    if cli.remove_duplicates {
         config
             .options
-            .insert("remove_duplicates".to_string(), remove_duplicates);
+            .insert("remove_duplicates".to_string(), cli.remove_duplicates);
     }
 
     let subs = [EventType::Window, EventType::Workspace];
@@ -85,7 +56,7 @@ fn main() -> Result<(), ExitFailure> {
 
     swaywsr::update_tree(&mut command_connection, &config)?;
 
-    for event in connection.subscribe(&subs)? {
+    for event in connection.subscribe(subs)? {
         match event? {
             Event::Window(e) => {
                 if let Err(error) =

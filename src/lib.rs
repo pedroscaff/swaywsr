@@ -1,22 +1,8 @@
-extern crate itertools;
 use itertools::Itertools;
-
-#[macro_use]
-extern crate failure_derive;
-extern crate failure;
-use failure::Error;
-
-extern crate serde;
-
-#[macro_use]
-extern crate lazy_static;
-
-extern crate toml;
-
-use swayipc::reply::{Node, NodeType, WindowChange, WindowEvent, WorkspaceChange, WorkspaceEvent};
-use swayipc::Connection;
-
 use std::collections::HashMap as Map;
+use swayipc::{
+    Connection, Node, NodeType, WindowChange, WindowEvent, WorkspaceChange, WorkspaceEvent,
+};
 
 pub mod config;
 pub mod icons;
@@ -39,22 +25,16 @@ impl Default for Config {
     }
 }
 
-#[derive(Debug, Fail)]
+#[derive(Debug, thiserror::Error)]
 enum LookupError {
-    #[fail(
-        display = "Failed to get app_id or window_properties for node: {:#?}",
-        _0
-    )]
+    #[error("Failed to get app_id or window_properties for node: {0:#?}")]
     MissingInformation(String),
-    #[fail(display = "Failed to get name for workspace: {:#?}", _0)]
+    #[error("Failed to get name for workspace: {0:#?}")]
     WorkspaceName(Box<Node>),
 }
 
 fn get_option(config: &Config, key: &str) -> bool {
-    return match config.options.get(key) {
-        Some(v) => *v,
-        None => false,
-    };
+    config.options.get(key).map_or(false, |v| *v)
 }
 
 fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
@@ -93,9 +73,7 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
                         format!("{} {}", default_icon, class_display_name)
                     }
                 }
-                None => {
-                    class_display_name.to_string()
-                }
+                None => class_display_name.to_string(),
             },
         })
     } else {
@@ -125,11 +103,7 @@ fn get_window_nodes(mut nodes: Vec<Vec<&Node>>) -> Vec<&Node> {
     while let Some(next) = nodes.pop() {
         for n in next {
             nodes.push(n.nodes.iter().collect());
-            if n.window.is_some() {
-                window_nodes.push(n);
-            } else if n.app_id.is_some() {
-                window_nodes.push(n);
-            }
+            window_nodes.push(n);
         }
     }
 
@@ -150,7 +124,7 @@ fn get_classes(workspace: &Node, config: &Config) -> Vec<String> {
         let class = match get_class(node, config) {
             Ok(class) => class,
             Err(e) => {
-                eprintln!("get class error: {}", e);
+                eprintln!("get class error: {e:?}");
                 continue;
             }
         };
@@ -161,7 +135,7 @@ fn get_classes(workspace: &Node, config: &Config) -> Vec<String> {
 }
 
 /// Update all workspace names in tree
-pub fn update_tree(connection: &mut Connection, config: &Config) -> Result<(), Error> {
+pub fn update_tree(connection: &mut Connection, config: &Config) -> anyhow::Result<()> {
     let tree = connection.get_tree()?;
     for workspace in get_workspaces(tree) {
         let separator = match config.general.get("separator") {
@@ -206,7 +180,7 @@ pub fn handle_window_event(
     event: &WindowEvent,
     connection: &mut Connection,
     config: &Config,
-) -> Result<(), Error> {
+) -> anyhow::Result<()> {
     match event.change {
         WindowChange::New | WindowChange::Close | WindowChange::Move => {
             update_tree(connection, config)
@@ -219,7 +193,7 @@ pub fn handle_workspace_event(
     event: &WorkspaceEvent,
     connection: &mut Connection,
     config: &Config,
-) -> Result<(), Error> {
+) -> anyhow::Result<()> {
     match event.change {
         WorkspaceChange::Empty | WorkspaceChange::Focus => update_tree(connection, config),
         _ => Ok(()),
