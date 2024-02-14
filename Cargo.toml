@@ -10,18 +10,17 @@ keywords = ["sway-wm", "window-manager", "workspaces", "linux"]
 categories = ["command-line-utilities"]
 license = "MIT"
 exclude = ["/assets/*"]
-edition = "2018"
+edition = "2021"
 
 [badges]
 travis-ci = { repository = "pedroscaff/swaywsr" }
 
 [dependencies]
-exitfailure = "0.5.1"
-failure = "0.1.8"
-failure_derive = "0.1.8"
+thiserror = "1.0.44"
+anyhow = "1.0.72"
 lazy_static = "1.4.0"
-clap = "2.33.3"
-toml = "0.5.8"
-serde = { version = "1.0.123", features = ["derive"] }
-swayipc = "2.7.2"
-itertools = "0.10.0"
+clap = { version = "4", features = ["derive"] }
+toml = "0.7.6"
+serde = { version = "1.0.183", features = ["derive"] }
+swayipc = "3.0.1"
+itertools = "0.11.0"

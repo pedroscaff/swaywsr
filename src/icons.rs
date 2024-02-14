@@ -14,7 +14,7 @@ macro_rules! map_to_owned (
      };
 );
 
-lazy_static! {
+lazy_static::lazy_static! {
     pub static ref AWESOME: Map<String, char> = map_to_owned! {
         "Firefox" => '',
         "TelegramDesktop" => '',

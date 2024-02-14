@@ -1,11 +1,10 @@
-use failure::Error;
 use serde::Deserialize;
 use std::collections::HashMap as Map;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
-lazy_static! {
+lazy_static::lazy_static! {
     pub static ref EMPTY_MAP: Map<String, String> = Map::new();
     pub static ref EMPTY_OPT_MAP: Map<String, bool> = Map::new();
 }
@@ -30,8 +29,8 @@ impl Default for Config {
     }
 }
 
-pub fn read_toml_config(path: &Path) -> Result<Config, Error> {
-    let mut file = File::open(&path)?;
+pub fn read_toml_config(path: &Path) -> anyhow::Result<Config> {
+    let mut file = File::open(path)?;
     let mut buffer = String::new();
     file.read_to_string(&mut buffer)?;
     let config: Config = toml::from_str(&buffer)?;
