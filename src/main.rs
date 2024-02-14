@@ -6,7 +6,7 @@ use swayipc::{Connection, Event, EventType};
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// Set to no to display only icons (if available)
+    /// Sets icons to be used
     #[arg(short, long)]
     #[clap(value_parser(["awesome"]))]
     icons: Option<String>,
