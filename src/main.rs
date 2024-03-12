@@ -42,12 +42,12 @@ fn main() -> anyhow::Result<()> {
     };
 
     if cli.no_names {
-        config.options.insert("no_names".to_string(), cli.no_names);
+        config.options.insert("no-names".to_string(), cli.no_names);
     }
     if cli.remove_duplicates {
         config
             .options
-            .insert("remove_duplicates".to_string(), cli.remove_duplicates);
+            .insert("remove-duplicates".to_string(), cli.remove_duplicates);
     }
 
     let subs = [EventType::Window, EventType::Workspace];
