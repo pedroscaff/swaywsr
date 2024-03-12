@@ -15,3 +15,6 @@ TelegramDesktop = "Telegram"
 
 [general]
 separator = "  "
+
+[options]
+remove-duplicates = true

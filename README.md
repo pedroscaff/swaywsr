@@ -35,7 +35,7 @@ You must provide a config file that is passed using the `--config path_to_file.t
 - `icons` to assign icons to classes
 - `aliases` to assign alternative names to be displayed 
 - `general` to assign the separator and default icon
-- `options` to assign additional flags available in the cli interface. Replace hyphens from cli with underscores, e.g. `--no-names` would be `no_names` in the config file.
+- `options` to assign additional flags available in the cli interface. Replace hyphens from cli with underscores, e.g. `--no-names` would be `no-names` in the config file.
 
 You can configure icons for the respective classes, a very basic preset for font-awesome is configured, to enable it use the option `--icons awesome` (requires font-awesome to be installed).
 
@@ -61,8 +61,8 @@ TelegramDesktop = "Telegram"
 seperator = ""
 
 [options]
-no_names = true
-remove_duplicates = true
+no-names = true
+remove-duplicates = true
 ```
 
 For an overview of available options
