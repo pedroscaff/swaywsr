@@ -55,7 +55,7 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
             None => &class,
         };
 
-        let no_names = get_option(config, "no-names");
+        let no_names = get_option(config, "no-names") || get_option(config, "no_names");
 
         Ok(match config.icons.get(&class) {
             Some(icon) => {
@@ -103,7 +103,9 @@ fn get_window_nodes(mut nodes: Vec<Vec<&Node>>) -> Vec<&Node> {
     while let Some(next) = nodes.pop() {
         for n in next {
             nodes.push(n.nodes.iter().collect());
-            window_nodes.push(n);
+            if NodeType::Con == n.node_type && n.name.is_some() {
+                window_nodes.push(n);
+            }
         }
     }
 
@@ -144,7 +146,7 @@ pub fn update_tree(connection: &mut Connection, config: &Config) -> anyhow::Resu
         };
 
         let classes = get_classes(&workspace, config);
-        let classes = if get_option(config, "remove-duplicates") {
+        let classes = if get_option(config, "remove-duplicates") || get_option(config, "remove_duplicates") {
             classes.into_iter().unique().collect()
         } else {
             classes
