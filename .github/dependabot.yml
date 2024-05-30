@@ -1,0 +1,25 @@
+# Sets automatic dependencies update
+version: 2
+updates:
+  # Maintain dependencies for Cargo
+  - package-ecosystem: "cargo"
+    # Workflow files stored in the default location of `.github/workflows`.
+    # (You don't need to specify `/.github/workflows` for `directory`. You can
+    # use `directory: "/"`.)
+    directory: "/"
+    # Set a monthly update so it does not drag too much attention ;)
+    # And set the update during the end of a week
+    schedule:
+      interval: "monthly"
+      day: "sunday"
+      time: "16:00"
+      timezone: "CET"
+    # Set a clear commit subject.
+    commit-message:
+      prefix: "[dependencies] "
+      include: "scope"
+    # Set assignees
+    assignees:
+      - "GallaisPoutine"
+
+
