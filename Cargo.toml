@@ -23,4 +23,4 @@ clap = { version = "4", features = ["derive"] }
 toml = "0.8.14"
 serde = { version = "1.0.204", features = ["derive"] }
 swayipc = "3.0.1"
-itertools = "0.12.1"
+itertools = "0.13.0"
