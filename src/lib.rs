@@ -33,6 +33,10 @@ enum LookupError {
     WorkspaceName(Box<Node>),
 }
 
+/*
+ * TODO return true regardless of '_' and '-'
+ * to avoid multiple OR conditions.
+ */
 fn get_option(config: &Config, key: &str) -> bool {
     config.options.get(key).map_or(false, |v| *v)
 }
@@ -139,40 +143,50 @@ fn get_classes(workspace: &Node, config: &Config) -> Vec<String> {
 /// Update all workspace names in tree
 pub fn update_tree(connection: &mut Connection, config: &Config) -> anyhow::Result<()> {
     let tree = connection.get_tree()?;
+    let char_ignore = match config.general.get("ignore-char") {
+        Some(s) => s,
+        None => ".",
+    };
+
     for workspace in get_workspaces(tree) {
         let separator = match config.general.get("separator") {
             Some(s) => s,
             None => " | ",
         };
 
-        let classes = get_classes(&workspace, config);
-        let classes = if get_option(config, "remove-duplicates") || get_option(config, "remove_duplicates") {
-            classes.into_iter().unique().collect()
-        } else {
-            classes
-        };
+        let workspace_name_opt: Option<String> = workspace.name.clone().into();
+        let workspace_name = workspace_name_opt.unwrap_or("".to_string());
 
-        let classes = classes.join(separator);
-        let classes = if !classes.is_empty() {
-            format!(" {}", classes)
-        } else {
-            classes
-        };
+        if !workspace_name.ends_with(char_ignore) {
+            let classes = get_classes(&workspace, config);
+            let classes = if get_option(config, "remove-duplicates") || get_option(config, "remove_duplicates") {
+                classes.into_iter().unique().collect()
+            } else {
+                classes
+            };
 
-        let old: String = workspace
-            .name
-            .to_owned()
-            .ok_or_else(|| LookupError::WorkspaceName(Box::new(workspace)))?;
+            let classes = classes.join(separator);
+            let classes = if !classes.is_empty() {
+                format!(" {}", classes)
+            } else {
+                classes
+            };
 
-        let mut new = old.split(' ').next().unwrap().to_owned();
+            let old: String = workspace
+                .name
+                .to_owned()
+                .ok_or_else(|| LookupError::WorkspaceName(Box::new(workspace)))?;
 
-        if !classes.is_empty() {
-            new.push_str(&classes);
-        }
+            let mut new = old.split(' ').next().unwrap().to_owned();
 
-        if old != new {
-            let command = format!("rename workspace \"{}\" to \"{}\"", old, new);
-            connection.run_command(&command)?;
+            if !classes.is_empty() {
+                new.push_str(&classes);
+            }
+
+            if old != new {
+                let command = format!("rename workspace \"{}\" to \"{}\"", old, new);
+                connection.run_command(&command)?;
+            }
         }
     }
     Ok(())
