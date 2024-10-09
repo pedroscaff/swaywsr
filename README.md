@@ -34,12 +34,14 @@ exec_always $PATH_TO_RELEASE_BINARY
 You must provide a config file that is passed using the `--config path_to_file.toml` option. The `toml` file has four fields:
 - `icons` to assign icons to classes
 - `aliases` to assign alternative names to be displayed 
-- `general` to assign the separator and default icon
+- `general` to assign the separator the default icon and the protected workspace ending char.
 - `options` to assign additional flags available in the cli interface. Replace hyphens from cli with underscores, e.g. `--no-names` would be `no-names` in the config file.
 
 You can configure icons for the respective classes, a very basic preset for font-awesome is configured, to enable it use the option `--icons awesome` (requires font-awesome to be installed).
 
 If you have icons and don't want the names to be displayed, you can use the `--no-names` flag.
+
+Workspace name can be protected from dynamic renaming using a trailing character. It defaults to '.', but can be overwritten using the option `ignore-char`.
 
 Example config can be found in `assets/example_config.toml`
 
@@ -59,6 +61,7 @@ TelegramDesktop = "Telegram"
 
 [general]
 seperator = ""
+ignore-char = "#"
 
 [options]
 no-names = true
@@ -114,6 +117,7 @@ You can take this a bit further by using a bar that trims the workspace number a
 
 ## Contributors
 * [Pedro Scaff (pedroscaff)](https://github.com/pedroscaff)
+* [Raphaël Gallais-Pou (GallaisPoutine)](https://github.com/GallaisPoutine)
 
 ## Attribution
 Thanks [Daniel Berg (roosta)](https://github.com/roosta) for the original [i3wsr](https://github.com/roosta/i3wsr) implementation. This program would not be possible without
