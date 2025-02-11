@@ -25,7 +25,7 @@ Just launch the program and it'll listen for events if you are running sway.
 Another option is to put something like this in your sway config
 
 ```
-exec_always $PATH_TO_RELEASE_BINARY
+exec_always pgrep -x swaywsr > /dev/null && pkill -x swaywsr; $PATH_TO_RELEASE_BINARY
 ```
 
 ### Options
