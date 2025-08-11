@@ -20,7 +20,7 @@ thiserror = "2.0.12"
 anyhow = "1.0.98"
 lazy_static = "1.5.0"
 clap = { version = "4", features = ["derive"] }
-toml = "0.8.22"
+toml = "0.9.4"
 serde = { version = "1.0.219", features = ["derive"] }
 swayipc = "3.0.3"
 itertools = "0.14.0"
