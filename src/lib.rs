@@ -107,7 +107,7 @@ fn get_window_nodes(mut nodes: Vec<Vec<&Node>>) -> Vec<&Node> {
     while let Some(next) = nodes.pop() {
         for n in next {
             nodes.push(n.nodes.iter().collect());
-            if NodeType::Con == n.node_type && n.name.is_some() {
+            if (NodeType::Con == n.node_type || NodeType::FloatingCon == n.node_type) && n.name.is_some() {
                 window_nodes.push(n);
             }
         }
