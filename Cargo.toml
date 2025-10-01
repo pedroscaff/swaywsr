@@ -16,7 +16,7 @@ edition = "2021"
 travis-ci = { repository = "pedroscaff/swaywsr" }
 
 [dependencies]
-thiserror = "2.0.12"
+thiserror = "2.0.17"
 anyhow = "1.0.98"
 lazy_static = "1.5.0"
 clap = { version = "4", features = ["derive"] }
