@@ -60,7 +60,7 @@ TelegramDesktop = "Telegram"
 "Org.gnome.Nautilus" = "Nautilus"
 
 [general]
-seperator = ""
+separator = ""
 ignore-char = "#"
 
 [options]
