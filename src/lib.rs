@@ -33,12 +33,14 @@ enum LookupError {
     WorkspaceName(Box<Node>),
 }
 
-/*
- * TODO return true regardless of '_' and '-'
- * to avoid multiple OR conditions.
- */
 fn get_option(config: &Config, key: &str) -> bool {
     config.options.get(key).map_or(false, |v| *v)
+}
+
+macro_rules! get_option_variants {
+    ($config:expr, $key:literal) => {{
+        get_option($config, $key) || get_option($config, &str::replace($key, "-", "_"))
+    }};
 }
 
 fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
@@ -59,7 +61,7 @@ fn get_class(node: &Node, config: &Config) -> Result<String, LookupError> {
             None => &class,
         };
 
-        let no_names = get_option(config, "no-names") || get_option(config, "no_names");
+        let no_names = get_option_variants!(config, "no-names");
 
         Ok(match config.icons.get(&class) {
             Some(icon) => {
@@ -159,7 +161,7 @@ pub fn update_tree(connection: &mut Connection, config: &Config) -> anyhow::Resu
 
         if !workspace_name.ends_with(char_ignore) {
             let classes = get_classes(&workspace, config);
-            let classes = if get_option(config, "remove-duplicates") || get_option(config, "remove_duplicates") {
+            let classes = if get_option_variants!(config, "remove-duplicates") {
                 classes.into_iter().unique().collect()
             } else {
                 classes
